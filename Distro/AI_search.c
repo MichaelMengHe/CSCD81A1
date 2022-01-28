@@ -196,83 +196,85 @@ void search(double gr[graph_size][4], int path[graph_size][2], int visit_order[s
  // Stub so that the code compiles/runs - The code below will be removed and replaced by your code!
 	// Mode 0 i BFS
  	if (mode == 0) {
+		 // assign the info about cheese and cats to usse later
 		int cheese_list[cheeses];
-		int cheese_idx;
 		int cat_list[cats];
-		int cat_idx;
-		int mouse_idx = mouse_loc[0][0] + (mouse_loc[0][1] * size_X); // Get the mouse index
-		int current_idx;
-		struct Queue *queue = create_queue(); // Create a queue for BFS
-		for (int k = 0; k < cheeses; k++) {
-			cheese_list[k] = cheese_loc[k][0] + (cheese_loc[k][1] * size_X);
+		// this gets the index of the mouse
+		int mouse_index = mouse_loc[0][0] + (mouse_loc[0][1] * size_X);
+		// set curr index and make a queue for BFS
+		int curr_index;
+		struct Queue *queue = create_queue();
+		for (int x = 0; x < cheeses; x++) {
+			cheese_list[x] = cheese_loc[x][0] + (cheese_loc[x][1] * size_X);
 		}
-		for (int l = 0; l < cats; l++) {
-			cat_list[l] = cat_loc[l][0] + (cat_loc[l][1] * size_X);
+		for (int y = 0; y < cats; y++) {
+			cat_list[y] = cat_loc[y][0] + (cat_loc[y][1] * size_X);
 		}
-		enqueue(queue, mouse_idx);						   // Enqueue the origin of mouse
-		visit_order[mouse_loc[0][0]][mouse_loc[0][1]] = 1; // Origin is visited first
+		// starting point is the mouse index
+		enqueue(queue, mouse_index);
+		visit_order[mouse_loc[0][0]][mouse_loc[0][1]] = 1;
+		// inititate counters for loop
 		int visit_counter = 2;
-		int current_x;
-		int current_y;
+		int curr_x;
+		int curr_y;
 		int new_x;
 		int new_y;
-		int new_idx;
+		int new_index;
 		int i;
-		int pre_level[graph_size][2];
-		pre_level[mouse_idx][0] = 0;
-		pre_level[mouse_idx][1] = 0;
-		// Until we reach cheese
+		int prev_level[graph_size][2];
+		prev_level[mouse_index][0] = 0;
+		prev_level[mouse_index][1] = 0;
+		// loop until mouse reaches cheese
 		do {
-			// Pop the next node
-			current_idx = dequeue(queue);
-			if (current_idx == -1) {
+			// get next node from queue
+			curr_index = dequeue(queue);
+			if (curr_index == -1) {
 				free_queue(queue);
 				return;
 			}
-			current_x = current_idx % size_X;
-			current_y = current_idx / size_Y;
-			// expand neighbours top, right, bottom, left
-			if (is_in(current_idx, cheese_list, cheeses) == 0) {
+			curr_x = curr_index % size_X;
+			curr_y = curr_index / size_Y;
+			// expand neighbours
+			if (is_in(curr_index, cheese_list, cheeses) == 0) {
 				for (i = 0; i < 4; i++) {
-					if (gr[current_idx][i] == (double)1) {
-						// Add to queue the neighbouring nodes if there exists a weight between them
+					if (gr[curr_index][i] == (double)1) {
+						// Add to queue if there exists a weight between them
 						if (i == 0) {
-							new_x = current_x;
-							new_y = current_y - 1;
+							new_x = curr_x;
+							new_y = curr_y - 1;
 						}
 						else if (i == 1) {
-							new_x = current_x + 1;
-							new_y = current_y;
+							new_x = curr_x + 1;
+							new_y = curr_y;
 						}
 						else if (i == 2) {
-							new_x = current_x;
-							new_y = current_y + 1;
+							new_x = curr_x;
+							new_y = curr_y + 1;
 						}
 						else if (i == 3) {
-							new_x = current_x - 1;
-							new_y = current_y;
+							new_x = curr_x - 1;
+							new_y = curr_y;
 						}
-						if (visit_order[new_x][new_y] == 0 && is_in((new_idx = new_x + (new_y * size_X)), cat_list, cats) == 0) {
-							enqueue(queue, new_idx);
-							pre_level[new_idx][0] = current_idx;
-							pre_level[new_idx][1] = pre_level[current_idx][1] + 1;
-							// Add to visiting order
+						if (visit_order[new_x][new_y] == 0 && is_in((new_index = new_x + (new_y * size_X)), cat_list, cats) == 0) {
+							enqueue(queue, new_index);
+							prev_level[new_index][0] = curr_index;
+							prev_level[new_index][1] = prev_level[curr_index][1] + 1;
+							// Add to visited
 							visit_order[new_x][new_y] = visit_counter;
 							visit_counter++;
 						}
 					}
 				}
 			}
-		} while (is_in(current_idx, cheese_list, cheeses) == 0);
-		// Build the path
-		for (int j = pre_level[current_idx][1]; j >= 0; j--) {
-			path[j][0] = current_idx % size_X;
-			path[j][1] = current_idx / size_Y;
-			current_idx = pre_level[current_idx][0];
+		} while (is_in(curr_index, cheese_list, cheeses) == 0);
+		// Build the path of the mouse
+		for (int j = prev_level[curr_index][1]; j >= 0; j--) {
+			path[j][0] = curr_index % size_X;
+			path[j][1] = curr_index / size_Y;
+			curr_index = prev_level[curr_index][0];
 		}
 		free_queue(queue);
 	}
-
  return;
 }
 
@@ -297,7 +299,20 @@ int H_cost(int x, int y, int cat_loc[10][2], int cheese_loc[10][2], int mouse_lo
 		These arguments are as described in the search() function above
  */
 
- return(1);		// <-- Evidently you will need to update this.
+	// Use Manhattan distance
+	int least_cost = -1;
+	int manhattan;
+	// Loop through each cheese and calculate its manhattan distance from (x, y)
+	for (int i = 0; i < cheeses; i++)
+	{
+		manhattan = abs(x - cheese_loc[i][0]) + abs(y - cheese_loc[i][1]);
+		if (manhattan < least_cost || least_cost == -1)
+		{
+			least_cost = manhattan;
+		}
+	}
+	// return the least cost
+	return least_cost;		
 }
 
 int H_cost_nokitty(int x, int y, int cat_loc[10][2], int cheese_loc[10][2], int mouse_loc[1][2], int cats, int cheeses, double gr[graph_size][4])
@@ -316,8 +331,28 @@ int H_cost_nokitty(int x, int y, int cat_loc[10][2], int cheese_loc[10][2], int 
 
 	Input arguments have the same meaning as in the H_cost() function above.
  */
-
- return(1);		// <-- Evidently you will need to update this.
+	// Take both cats locations and cheese locations into account
+	int manhattan;
+	int closest_cat = -1;
+	int closest_cheese = -1;
+	int max_manhattan = size_X + size_Y;
+	// this gets the closet cat
+	for (int i = 0; i < cats; i++) {
+		manhattan = abs(x - cat_loc[i][0]) + abs(y - cat_loc[i][1]);
+		if (manhattan < closest_cat || closest_cat == -1) {
+			closest_cat = manhattan;
+		}
+	}
+	// this gets the closest cheese
+	for (int j = 0; j < cheeses; j++)
+	{
+		manhattan = abs(x - cheese_loc[j][0]) + abs(y - cheese_loc[j][1]);
+		if (manhattan < closest_cheese || closest_cheese == -1)
+		{
+			closest_cheese = manhattan;
+		}
+	}
+	return (closest_cheese * closest_cheese) * (max_manhattan - closest_cat) * (max_manhattan - closest_cat);
 }
 
 struct Queue *create_queue()
