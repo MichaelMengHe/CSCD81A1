@@ -34,6 +34,25 @@ void search(double gr[graph_size][4], int path[graph_size][2], int visit_order[s
 int H_cost(int x, int y, int cat_loc[10][2], int cheese_loc[10][2], int mouse_loc[1][2], int cats, int cheeses, double gr[graph_size][4]);
 int H_cost_nokitty(int x, int y, int cat_loc[10][2], int cheese_loc[10][2], int mouse_loc[1][2], int cats, int cheeses, double gr[graph_size][4]);
 
+struct Node
+{
+	int idx;
+	struct Node *next;
+};
+
+struct Queue
+{
+	struct Node *head;
+	struct Node *tail;
+};
+
+struct Queue *create_queue();
+struct Node *create_node(int idx);
+void enqueue(struct Queue *queue, int idx);
+int dequeue(struct Queue *queue);
+void free_queue(struct Queue *queue);
+
+int is_in(int curr_idx, int list[10], int size);
 // If you need to add any function prototypes yourself, you can do so *below* this line.
 
 

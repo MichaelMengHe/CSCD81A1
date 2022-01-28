@@ -27,18 +27,18 @@
 /**********************************************************************
 % COMPLETE THIS TEXT BOX:
 %
-% 1) Student Name:		
+% 1) Student Name: Meng He		
 % 2) Student Name:		
 %
-% 1) Student number:
+% 1) Student number: 1004181146
 % 2) Student number:
 % 
-% 1) UtorID
+% 1) UtorID hemeng2
 % 2) UtorID
 % 
 % We hereby certify that the work contained here is our own
 %
-% ____________________             _____________________
+% Meng He_____________             _____________________
 % (sign with your name)            (sign with your name)
 ***********************************************************************/
 
@@ -194,11 +194,84 @@ void search(double gr[graph_size][4], int path[graph_size][2], int visit_order[s
  ********************************************************************************************************/
 
  // Stub so that the code compiles/runs - The code below will be removed and replaced by your code!
-
- path[0][0]=mouse_loc[0][0];
- path[0][1]=mouse_loc[0][1];
- path[1][0]=mouse_loc[0][0];
- path[1][1]=mouse_loc[0][1];
+	// Mode 0 i BFS
+ 	if (mode == 0) {
+		int cheese_list[cheeses];
+		int cheese_idx;
+		int cat_list[cats];
+		int cat_idx;
+		int mouse_idx = mouse_loc[0][0] + (mouse_loc[0][1] * size_X); // Get the mouse index
+		int current_idx;
+		struct Queue *queue = create_queue(); // Create a queue for BFS
+		for (int k = 0; k < cheeses; k++) {
+			cheese_list[k] = cheese_loc[k][0] + (cheese_loc[k][1] * size_X);
+		}
+		for (int l = 0; l < cats; l++) {
+			cat_list[l] = cat_loc[l][0] + (cat_loc[l][1] * size_X);
+		}
+		enqueue(queue, mouse_idx);						   // Enqueue the origin of mouse
+		visit_order[mouse_loc[0][0]][mouse_loc[0][1]] = 1; // Origin is visited first
+		int visit_counter = 2;
+		int current_x;
+		int current_y;
+		int new_x;
+		int new_y;
+		int new_idx;
+		int i;
+		int pre_level[graph_size][2];
+		pre_level[mouse_idx][0] = 0;
+		pre_level[mouse_idx][1] = 0;
+		// Until we reach cheese
+		do {
+			// Pop the next node
+			current_idx = dequeue(queue);
+			if (current_idx == -1) {
+				free_queue(queue);
+				return;
+			}
+			current_x = current_idx % size_X;
+			current_y = current_idx / size_Y;
+			// expand neighbours top, right, bottom, left
+			if (is_in(current_idx, cheese_list, cheeses) == 0) {
+				for (i = 0; i < 4; i++) {
+					if (gr[current_idx][i] == (double)1) {
+						// Add to queue the neighbouring nodes if there exists a weight between them
+						if (i == 0) {
+							new_x = current_x;
+							new_y = current_y - 1;
+						}
+						else if (i == 1) {
+							new_x = current_x + 1;
+							new_y = current_y;
+						}
+						else if (i == 2) {
+							new_x = current_x;
+							new_y = current_y + 1;
+						}
+						else if (i == 3) {
+							new_x = current_x - 1;
+							new_y = current_y;
+						}
+						if (visit_order[new_x][new_y] == 0 && is_in((new_idx = new_x + (new_y * size_X)), cat_list, cats) == 0) {
+							enqueue(queue, new_idx);
+							pre_level[new_idx][0] = current_idx;
+							pre_level[new_idx][1] = pre_level[current_idx][1] + 1;
+							// Add to visiting order
+							visit_order[new_x][new_y] = visit_counter;
+							visit_counter++;
+						}
+					}
+				}
+			}
+		} while (is_in(current_idx, cheese_list, cheeses) == 0);
+		// Build the path
+		for (int j = pre_level[current_idx][1]; j >= 0; j--) {
+			path[j][0] = current_idx % size_X;
+			path[j][1] = current_idx / size_Y;
+			current_idx = pre_level[current_idx][0];
+		}
+		free_queue(queue);
+	}
 
  return;
 }
@@ -246,4 +319,85 @@ int H_cost_nokitty(int x, int y, int cat_loc[10][2], int cheese_loc[10][2], int 
 
  return(1);		// <-- Evidently you will need to update this.
 }
+
+struct Queue *create_queue()
+{
+	struct Queue *queue = (struct Queue *)malloc(sizeof(struct Queue));
+	queue->head = queue->tail = NULL;
+	return queue;
+}
+
+struct Node *create_node(int idx)
+{
+	struct Node *new_node = (struct Node *)malloc(sizeof(struct Node));
+	new_node->idx = idx;
+	new_node->next = NULL;
+	return new_node;
+}
+
+void enqueue(struct Queue *queue, int idx)
+{
+	struct Node *new_node = create_node(idx);
+	if (queue->tail == NULL)
+	{
+		queue->head = queue->tail = new_node;
+		return;
+	}
+	else
+	{
+		queue->tail->next = new_node;
+		queue->tail = new_node;
+	}
+	return;
+}
+
+int dequeue(struct Queue *queue)
+{
+	if (queue->head == NULL)
+	{
+		return -1;
+	}
+	struct Node *old_head = queue->head;
+	queue->head = old_head->next;
+	int idx = old_head->idx;
+	if (queue->head == NULL)
+	{
+		queue->tail = NULL;
+	}
+	free(old_head);
+	return idx;
+}
+
+void free_queue(struct Queue *queue)
+{
+	if (queue->head == NULL)
+	{
+		free(queue);
+	}
+	else
+	{
+		struct Node *temp = queue->head;
+		struct Node *temp2;
+		while ((temp2 = temp->next) != NULL)
+		{
+			free(temp);
+			temp = temp2;
+		}
+		free(temp);
+	}
+	return;
+}
+
+int is_in(int curr_idx, int list[10], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (curr_idx == list[i])
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
 
