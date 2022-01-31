@@ -10,15 +10,15 @@ ________________________________________________
 
 Student Name 1 (last, first): He Meng
 
-Student Name 2 (last, first):
+Student Name 2 (last, first): Tayeh, Mohamed
 
 Student number 1: 1004181146
 
-Student number 2:
+Student number 2: 1004742246
 
 UTORid 1: hemeng2
 
-UTORid 2:
+UTORid 2: tayehmoh
 
 READ THIS AND SIGN YOUR NAME AT THE END:
 
@@ -26,7 +26,7 @@ READ THIS AND SIGN YOUR NAME AT THE END:
 honesty and plaguarism. All work submitted as part
 of this assignment is my own.
 
-	Signed: _Meng He__	_(student 2 name here)__
+	Signed: _Meng He__	_Mohamed Tayeh__
 
 
 (-5 marks for failing to provide the identifying
@@ -45,44 +45,52 @@ but explain carefully when needed.
 2 .- (1 marks) Does this mean that in general BFS is a better search algorithm? (yes/no and give reasons to
      support your answer based on your observations)
 
+     Old:
      No, if there are multiple cheeses in the game, and they all exist very far from the mouse, then the mouse would benefit from
-     DFS, since there is a higher chance to ealier discover one of the cheeses hidden in very deep into the search.
-
+     DFS, since there is a higher chance to earlier discover one of the cheeses hidden in very deep into the search.
+     
+     New:
+     No, the reason why BFS than DFS in the game is that the search script was being called multiple times each time the mouse was
+     at a new location. This meant that the order in which the nodes were expanded matters a lot more. DFS goes route would change
+     everytime, since the order of the depth expansion would change the route.
 
 3 .- (2 marks) Describe the heuristic function you used for A* search. Why is this heuristic admissible?
 
-     Shortest Manhatten distance is used for the heuristic, since the Manhatten distance guarentees the shortest distance
-     from mouse node to cheese node, then h(n) <= h*(n), therefore the heuristic is admissable.
-
+     Shortest Manhatten distance is used for the heuristic, since the Manhatten distance guarentees the shortest distance as if
+     there are no walls from mouse node to cheese node, then h(n) <= h*(n), therefore the heuristic is admissable.
 
 4 .- (1 marks) Explain how your heuristic function accounts for the presence of multiple cheeses.
 
      The heuristic will calculate the shortest Manhatten distance from the mouse to all cheese nodes, and the shortest one will be
      selected. So presence of multiple cheeses are accounted for.
 
-
 5 .- (1 marks) Is A* equivalent to BFS for this problem? or is it better/worse? explain your answer based on 
      your observations.
 
      A* is better than BFS for this problem, since the heuristic leads the mouse to the cheese goals rather than uniformly searching
-     all nearby nodes. So it will find cheese faster.
+     all nearby nodes. So it will find cheese faster as it prioritizes the nodes that are between the closest cheese and the mouse
 
 6 .- (2 marks) Describe your heuristic function for A*-nokitty. How does it work? what factors are considered
      into the cost function? is it admissible (yes/no and why)?
 
-     The heuristic chosen for no kitty is the Manhatten distance to nearest cheese squared, and this is subtracted
-     by Manhatten distance to nearest cat squared.
-     The factors considered are how close the mouse is to the nearest cheese, which should be rewarded, so it is squared. 
-     But more importantly, avoiding the cat must be done at all costs, so the kitty distance is squared as well.
-     This heuristic is inadmissable since h(n) > h*(n), the cost will be greater than the actual distance.
+     The heuristic chosen for no kitty is the Manhatten distance to nearest cheese in addition to a penalty term that measures how 
+     close a cat is to a node. The penalty term is the maximum manhattin distance - manhattan distance between the node and the
+     closest cat.
+
+     The factors considered are how close the mouse is to the nearest cheese which is the same admissableheuristic from question 6. 
+     More importantly, avoiding the cat must be done at all costs, so the kitty manhattan distance is squared. This heuristic is inadmissable
+     since h(n) > h*(n), the cost will be greater than the actual distance since we are adding a pentalty term for how far the kitty is
+     from that node.
 
 7 .- (2 marks) What is the largest limitation of the search algorithms implemented in this assignment?
      (i.e. is there anything we are missing that could lead to a smarter mouse?) - this is
      a more or less open question, but we talked about it in lecture!
 
      The limitations of BFS, DFS and A* is that they are all very rigidely defined algorithms, to optimally find the solution
-     given it's style of search. However, when kitty are introduced, the algorithms fail to adapt well to surviving and avoiding the cats.
-     So a better algorithm would be more fleexible, and willing to exxchange some optimality to avoid kitties well.
+     given it's style of search. The algorithm assume constant factors that can be calculated for entire search space and fed into it, 
+     it doesn't learn as it is going and improve the heuristic over time. The heuristic is constant, e.g. if goes through a path then 
+     back to avoid the cats, then goes back to that path, it would treat that path as a completely new path. In addition, the
+     heuristic does not allow for real time updates and needs to be rerun everytime which can be computationally demanding over time.
 
 _____________________________________________________
 
@@ -91,16 +99,18 @@ doesn't work, or what problems exist.
 	
 		Complete/Working	Partial		Not done
 
-DFS
+DFS                              x
 
 BFS             x
 
-A*
+A*              x
 
 H               x
 
 H_no_cats       x
 
+DFS - finds a path but not the shortest path to the cheese, therefore it 
+keeps going about in the path then changing again when teh script is called.
 _____________________________________________________
 
 Marking:

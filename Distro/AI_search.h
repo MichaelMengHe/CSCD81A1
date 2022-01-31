@@ -54,6 +54,7 @@ struct Node *create_node(int idx);
 void enqueue(struct Queue *queue, int idx, int cost, int is_a_star);
 int dequeue(struct Queue *queue);
 void free_queue(struct Queue *queue);
+int is_empty(struct Queue *queue);
 
 int is_in(int curr_idx, int list[10], int size);
 
