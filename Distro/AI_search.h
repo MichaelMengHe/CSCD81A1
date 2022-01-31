@@ -21,10 +21,10 @@
 #define __AI_search_header
 
 // Generally needed includes
-#include<stdio.h>
-#include<stdlib.h>
-#include<math.h>
-#include<malloc.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <malloc.h>
 
 #include "board_layout.h"
 
@@ -34,9 +34,12 @@ void search(double gr[graph_size][4], int path[graph_size][2], int visit_order[s
 int H_cost(int x, int y, int cat_loc[10][2], int cheese_loc[10][2], int mouse_loc[1][2], int cats, int cheeses, double gr[graph_size][4]);
 int H_cost_nokitty(int x, int y, int cat_loc[10][2], int cheese_loc[10][2], int mouse_loc[1][2], int cats, int cheeses, double gr[graph_size][4]);
 
+// If you need to add any function prototypes yourself, you can do so *below* this line.
+
 struct Node
 {
 	int idx;
+	int cost;
 	struct Node *next;
 };
 
@@ -48,13 +51,15 @@ struct Queue
 
 struct Queue *create_queue();
 struct Node *create_node(int idx);
-void enqueue(struct Queue *queue, int idx);
+void enqueue(struct Queue *queue, int idx, int cost, int is_a_star);
 int dequeue(struct Queue *queue);
 void free_queue(struct Queue *queue);
 
 int is_in(int curr_idx, int list[10], int size);
-// If you need to add any function prototypes yourself, you can do so *below* this line.
 
+int dfs(int node_index, int *visit_counter, int visit_order[size_X][size_Y], double gr[graph_size][4], int cat_list[10], int cats, int cheese_list[10], int cheeses, int path[graph_size][2]);
+void reverse_array(int path[1024][2], int n);
+void print_path(int path[graph_size][2], int final_index);
+void print_arr(int arr[graph_size]);
 
 #endif
-
